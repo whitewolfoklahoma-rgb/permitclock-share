@@ -112,10 +112,42 @@
     #printArea table{border:1px solid #999; width:100%; border-collapse:collapse;}
     #printArea th, #printArea td{border:1px solid #ccc; padding:6px 8px;}
   }
+  /* ===== PermitClock v0.1.1-demo: modern app-look redesign (BirdTally pattern, navy/green palette) ===== */
+  :root{--bar-h:64px;--shadow:0 2px 6px rgba(18,38,58,.07),0 10px 26px rgba(18,38,58,.08);}
+  body{padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom) + 16px);}
+  header{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,var(--navy),var(--navy2) 62%,#26557c);box-shadow:0 2px 12px rgba(18,38,58,.35);padding:12px 28px;}
+  header .mark{flex:0 0 auto;width:50px;height:50px;border-radius:15px;background:linear-gradient(145deg,#3ecf82,#0f7a4d);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 8px rgba(0,0,0,.25);}
+  header .logo{font-size:23px;line-height:1.1;}
+  /* Bottom tab bar. Nav buttons are static markup, so each carries real
+     icon/label spans; visible labels are shortened ("Home", "Vault",
+     "Packets", "Chase", "Pricing") so 7 tabs fit at 390px, and each
+     button's aria-label keeps the full original name. */
+  nav{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:60;background:rgba(255,255,255,.97);border-top:1px solid var(--line);border-bottom:none;box-shadow:0 -3px 16px rgba(18,38,58,.14);padding:6px 8px calc(6px + env(safe-area-inset-bottom));flex-wrap:nowrap;justify-content:center;}
+  nav button{flex:1 1 0;min-width:0;max-width:110px;min-height:56px;background:none;border-bottom:none;color:var(--mut);border-radius:14px;padding:4px 1px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-weight:700;}
+  nav button .ic{font-size:21px;line-height:1.15;padding:3px 12px;border-radius:999px;transition:background .15s;pointer-events:none;}
+  nav button .lb{font-size:11.5px;letter-spacing:.1px;white-space:nowrap;pointer-events:none;}
+  nav button.active{color:var(--navy);border-bottom:none;}
+  nav button.active .ic{background:var(--accent);box-shadow:0 2px 6px rgba(15,122,77,.45);}
+  section.panel.active{animation:pcTabIn .28s ease both;}
+  @keyframes pcTabIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .card,.statstrip,.formcard,.permitcard,.pricecard,details,.empty,.riskbanner,.digestbox{border-radius:16px;box-shadow:var(--shadow);}
+  table{border-radius:16px;}
+  .btn{border-radius:999px;min-height:48px;}
+  .btn.small{min-height:44px;}
+  input[type=text], input[type=number], input[type=email], input[type=date], select, textarea{border-radius:12px;}
+  .micbtn{border-radius:50%;}
+  .err,.okmsg{border-radius:12px;}
+  #toast{bottom:calc(var(--bar-h) + env(safe-area-inset-bottom) + 14px);border-radius:999px;z-index:70;pointer-events:none;}
+  /* scroll-into-view must never park a control under the fixed bar or the
+     sticky header (batch-8 FringeFile lesson: real taps and keyboard
+     focus both land clear) */
+  button,input,select,textarea,a.btn,summary{scroll-margin-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom) + 32px);scroll-margin-top:96px;}
+  @media print{body{padding-bottom:0;}}
 </style>
 </head>
 <body>
 <header>
+  <div class="mark" aria-hidden="true">⏱️</div>
   <div>
     <div class="logo">Permit<span>Clock</span></div>
     <div class="sub">License, permit &amp; insurance renewal clock — every expiration your company has, on one clock.</div>
@@ -129,13 +161,13 @@
   <div>Today: <b id="barToday"></b></div>
 </div>
 <nav id="mainNav">
-  <button data-view="dashboard" class="active">Dashboard</button>
-  <button data-view="credentials">Credentials</button>
-  <button data-view="permits">Permits</button>
-  <button data-view="packets">Renewal Packets</button>
-  <button data-view="chase">Chase &amp; Digest</button>
-  <button data-view="pricing">Pricing &amp; Pilot</button>
-  <button data-view="help">Help</button>
+  <button data-view="dashboard" class="active" aria-label="Dashboard"><span class="ic" aria-hidden="true">📊</span><span class="lb">Home</span></button>
+  <button data-view="credentials" aria-label="Credentials"><span class="ic" aria-hidden="true">🪪</span><span class="lb">Vault</span></button>
+  <button data-view="permits" aria-label="Permits"><span class="ic" aria-hidden="true">🧾</span><span class="lb">Permits</span></button>
+  <button data-view="packets" aria-label="Renewal Packets"><span class="ic" aria-hidden="true">📦</span><span class="lb">Packets</span></button>
+  <button data-view="chase" aria-label="Chase &amp; Digest"><span class="ic" aria-hidden="true">🔔</span><span class="lb">Chase</span></button>
+  <button data-view="pricing" aria-label="Pricing &amp; Pilot"><span class="ic" aria-hidden="true">💲</span><span class="lb">Pricing</span></button>
+  <button data-view="help" aria-label="Help"><span class="ic" aria-hidden="true">❓</span><span class="lb">Help</span></button>
 </nav>
 <main>
 
@@ -303,7 +335,7 @@
   <details><summary>What is the compliance register?</summary><p>One dated file from the Dashboard — CSV or print — listing every credential, its number, jurisdiction, holder, expiration, and status. It is the document an insurer, GC, or bonding company asks for when they want proof everything is current.</p></details>
   <details><summary>Where does my data live? How do I back it up?</summary><p>In this demo edition, everything lives <b>on this device, in this browser</b> — no account, nothing uploaded. Export the compliance register CSV to keep a dated copy, and use Reset below to restore the fictional sample data or Clear to empty the app. Clearing your browser's site data erases the vault, so export before you do.</p></details>
   <div class="toolbar" style="margin-top:16px;">
-    <a class="btn" id="emailUsBtn" href="mailto:whitewolfbackoffice@gmail.com?subject=PermitClock%20help%20%E2%80%94%20v0.1.0-demo&amp;body=Tell%20us%20what%20you%20were%20trying%20to%20do%20and%20what%20happened%3A%0A%0A">Email us</a>
+    <a class="btn" id="emailUsBtn" href="mailto:whitewolfbackoffice@gmail.com?subject=PermitClock%20help%20%E2%80%94%20v0.1.1-demo&amp;body=Tell%20us%20what%20you%20were%20trying%20to%20do%20and%20what%20happened%3A%0A%0A">Email us</a>
     <button class="btn secondary" id="resetDataBtn">Reset demo data</button>
     <button class="btn danger" id="clearDataBtn">Clear demo data</button>
   </div>
@@ -312,13 +344,13 @@
 </main>
 <footer>
   <div><b>PermitClock</b> — a White Wolf Tree Service LLC · Back-Office Services product. Questions or the pilot: whitewolfbackoffice@gmail.com</div>
-  <div style="margin-top:6px;">Demo build v0.1.0-demo · All companies, people, licenses, and policies shown are fictional sample data. Works offline; no account; your data stays on this device.</div>
+  <div style="margin-top:6px;">Demo build v0.1.1-demo · All companies, people, licenses, and policies shown are fictional sample data. Works offline; no account; your data stays on this device.</div>
 </footer>
 <div id="toast"></div>
 <div id="printArea"></div>
 
 <script>
-var VERSION = "v0.1.0-demo";
+var VERSION = "v0.1.1-demo";
 var LS_KEY = "permitclock_demo_v1";
 var state = null;
 
